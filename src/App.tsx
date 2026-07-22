@@ -17,6 +17,7 @@ import { HeaderBar } from './components/HeaderBar';
 import { SpellingCard } from './components/SpellingCard';
 import { ChoiceCard } from './components/ChoiceCard';
 import { DailyCompleteView } from './components/DailyCompleteView';
+import { IOSPwaGuide } from './components/IOSPwaGuide';
 
 // Full Screen Page Views
 import { OnboardingView } from './views/OnboardingView';
@@ -353,6 +354,9 @@ export default function App() {
 
       {/* Bottom Footer */}
       <footer className="text-center py-2 text-[11px] text-neutral-400 select-none" />
+
+      {/* iOS PWA 安装引导浮层：仅在 iOS Safari + 未安装时展示一次 */}
+      <IOSPwaGuide enabled={progress.onboardingCompleted} />
     </div>
   );
 }
