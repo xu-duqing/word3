@@ -295,7 +295,7 @@ export default function App() {
 
   // Default Full Screen View: Practice Stage
   return (
-    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in transition-colors duration-200">
+    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in">
       {/* Top Header Navigation Bar */}
       <HeaderBar
         currentProgress={currentIndex}

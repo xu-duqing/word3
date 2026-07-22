@@ -33,7 +33,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2] flex flex-col justify-between p-4 sm:p-6 select-none animate-fade-in">
+    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col justify-between p-4 sm:p-6 select-none animate-fade-in">
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col justify-between my-auto py-4">
         {/* Step Indicator Header */}
         <div className="flex items-center justify-between mb-6">

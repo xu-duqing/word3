@@ -216,7 +216,7 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
               key={index}
               className={`w-9 h-11 sm:w-11 sm:h-12 flex items-center justify-center text-xl sm:text-2xl font-mono font-bold rounded-t-lg transition-all ${borderClass} ${textClass}`}
             >
-              {isHyphen ? '-' : typedChar || (isHintRevealed ? targetWord[index] : '')}
+              {isHyphen ? '-' : status === 'wrong' ? targetWord[index] : typedChar || (isHintRevealed ? targetWord[index] : '')}
             </div>
           );
         })}
@@ -261,53 +261,36 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
         {/* Letter Placeholders */}
         {renderPlaceholders()}
 
-        {/* Status Feedback / Next action banner */}
-        {status === 'correct' && (
-          <div className="flex items-center justify-center gap-2 py-2 text-emerald-800 dark:text-emerald-300 font-semibold text-sm animate-fade-in">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-100 dark:fill-emerald-950" />
-            <span>拼写正确！即将跳转下一个</span>
-          </div>
-        )}
-
-        {status === 'wrong' && (
-          <div className="space-y-3 py-1 text-center animate-fade-in">
-            <div className="flex items-center justify-center gap-2 text-rose-800 dark:text-rose-300 font-semibold text-sm">
-              <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 fill-rose-100 dark:fill-rose-950" />
-              <span>拼写错误</span>
+        {/* Status Action Row - Constant Height Container to prevent Card Resizing */}
+        <div className="min-h-[44px] flex items-center justify-center mt-2">
+          {status === 'correct' && (
+            <div className="flex items-center justify-center gap-2 text-emerald-800 dark:text-emerald-300 font-semibold text-sm animate-fade-in">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-100 dark:fill-emerald-950" />
+              <span>拼写正确！即将跳转下一个</span>
             </div>
+          )}
 
-            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 rounded-2xl p-3 text-center">
-              <p className="text-xs text-rose-800 dark:text-rose-300 mb-1 font-medium">正确拼写：</p>
-              <p className="text-xl font-mono font-bold text-rose-900 dark:text-rose-200 tracking-wider">
-                {targetWord}
-              </p>
-            </div>
-
+          {status === 'wrong' && (
             <button
               onClick={handleSkipOrNext}
-              className="w-full mt-2 py-2.5 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition active:scale-98"
+              className="w-full py-2.5 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition active:scale-98 animate-fade-in"
             >
-              <span>立即继续</span>
+              <XCircle className="w-4 h-4 text-rose-500" />
+              <span>拼写错误 · 点击或按回车继续</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Built-in Custom Virtual Keyboard (Zero iOS OS Keyboard Glitches) */}
-      <div
-        className={`transition-all duration-300 ease-in-out overflow-hidden ${
-          status === 'typing'
-            ? 'max-h-[320px] opacity-100 mt-4 scale-100'
-            : 'max-h-0 opacity-0 mt-0 scale-95 pointer-events-none'
-        }`}
-      >
+      {/* Built-in Custom Virtual Keyboard (Stays rendered to prevent layout jump) */}
+      <div className="mt-4 w-full">
         <VirtualKeyboard
-          onKeyPress={handleKeyPress}
-          onBackspace={handleBackspace}
-          onEnter={() => checkAnswer(inputVal)}
+          onKeyPress={status === 'typing' ? handleKeyPress : handleSkipOrNext}
+          onBackspace={status === 'typing' ? handleBackspace : () => {}}
+          onEnter={status === 'typing' ? () => checkAnswer(inputVal) : handleSkipOrNext}
           onHint={handleHintClick}
-          disabled={status !== 'typing'}
+          disabled={status === 'correct'}
           usedHint={usedHint}
           activeKey={activePhysicalKey}
         />

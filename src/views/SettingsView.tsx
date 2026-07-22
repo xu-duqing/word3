@@ -79,7 +79,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 flex flex-col p-4 sm:p-6 select-none animate-fade-in transition-colors duration-200">
+    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 flex flex-col p-4 sm:p-6 select-none animate-fade-in">
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col space-y-6">
         {/* Navigation Header */}
         <div className="flex items-center justify-between py-2">
