@@ -10,11 +10,15 @@ const DISMISS_KEY = 'm_vocab_ios_pwa_guide_dismissed';
  *  - document.referrer 包含 android-app://（TWA）
  */
 export function isPWAStandalone(): boolean {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true ||
-    document.referrer.includes('android-app://')
-  );
+  try {
+    return (
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      (window.navigator as any).standalone === true ||
+      document.referrer.includes('android-app://')
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -23,8 +27,7 @@ export function isPWAStandalone(): boolean {
  *  - 兼容 iPadOS 13+ 桌面版 UA 伪装
  */
 export function isIOSPWAInstallable(): boolean {
-  if (isPWAStandalone()) return false;
-
+  const standalone = isPWAStandalone();
   const ua = navigator.userAgent || '';
   // iOS iPhone / iPod / 旧 iPad UA
   const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
@@ -33,7 +36,22 @@ export function isIOSPWAInstallable(): boolean {
     /Macintosh/.test(ua) &&
     (navigator.maxTouchPoints > 1 || 'ontouchend' in document);
 
-  return isIOS || isIPadOS13Plus;
+  const result = !standalone && (isIOS || isIPadOS13Plus);
+
+  // 诊断日志：方便通过 Safari Web Inspector 排查
+  console.log('[IOSPwaGuide]', {
+    standalone,
+    isIOS,
+    isIPadOS13Plus,
+    ua,
+    maxTouchPoints: navigator.maxTouchPoints,
+    result,
+    dismissed: (() => {
+      try { return localStorage.getItem(DISMISS_KEY) === '1'; } catch { return 'error'; }
+    })(),
+  });
+
+  return result;
 }
 
 interface IOSPwaGuideProps {
@@ -41,6 +59,17 @@ interface IOSPwaGuideProps {
   enabled?: boolean;
   /** 延迟展示时间（毫秒），避免与首屏渲染抢占 */
   delay?: number;
+  /** 强制展示（忽略 dismiss 标记，用于设置页手动触发） */
+  force?: boolean;
+}
+
+/** 清除 dismiss 标记，下次进入页面会重新展示引导 */
+export function resetIOSPwaGuideDismiss(): void {
+  try {
+    localStorage.removeItem(DISMISS_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 /**
@@ -50,22 +79,25 @@ interface IOSPwaGuideProps {
 export const IOSPwaGuide: React.FC<IOSPwaGuideProps> = ({
   enabled = true,
   delay = 800,
+  force = false,
 }) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!enabled) return;
-    if (!isIOSPWAInstallable()) return;
+    if (!enabled && !force) return;
+    if (!force && !isIOSPWAInstallable()) return;
 
-    try {
-      if (localStorage.getItem(DISMISS_KEY) === '1') return;
-    } catch {
-      // ignore
+    if (!force) {
+      try {
+        if (localStorage.getItem(DISMISS_KEY) === '1') return;
+      } catch {
+        // ignore
+      }
     }
 
     const timer = setTimeout(() => setVisible(true), delay);
     return () => clearTimeout(timer);
-  }, [enabled, delay]);
+  }, [enabled, delay, force]);
 
   const handleDismiss = () => {
     setVisible(false);

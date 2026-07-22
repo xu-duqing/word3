@@ -18,6 +18,7 @@ import { SpellingCard } from './components/SpellingCard';
 import { ChoiceCard } from './components/ChoiceCard';
 import { DailyCompleteView } from './components/DailyCompleteView';
 import { IOSPwaGuide } from './components/IOSPwaGuide';
+import { PwaUpdatePrompt } from './components/PwaUpdatePrompt';
 
 // Full Screen Page Views
 import { OnboardingView } from './views/OnboardingView';
@@ -267,41 +268,50 @@ export default function App() {
   // Render Full Page View according to currentView
   if (currentView === 'calendar') {
     return (
-      <StatsCalendarView
-        dailyLogs={dailyLogs}
-        currentStreak={progress.currentStreak}
-        totalPracticedCount={totalPracticedCount}
-        passPercentage={passPercentage}
-        activeLibrary={activeLibrary}
-        onBack={() => setCurrentView('practice')}
-      />
+      <>
+        <StatsCalendarView
+          dailyLogs={dailyLogs}
+          currentStreak={progress.currentStreak}
+          totalPracticedCount={totalPracticedCount}
+          passPercentage={passPercentage}
+          activeLibrary={activeLibrary}
+          onBack={() => setCurrentView('practice')}
+        />
+        <PwaUpdatePrompt />
+      </>
     );
   }
 
   if (currentView === 'wordbook') {
     return (
-      <WordbookView
-        words={words}
-        activeLibrary={activeLibrary}
-        soundEnabled={progress.soundEnabled}
-        todayWordIds={todayWordIds}
-        onBack={() => setCurrentView('practice')}
-      />
+      <>
+        <WordbookView
+          words={words}
+          activeLibrary={activeLibrary}
+          soundEnabled={progress.soundEnabled}
+          todayWordIds={todayWordIds}
+          onBack={() => setCurrentView('practice')}
+        />
+        <PwaUpdatePrompt />
+      </>
     );
   }
 
   if (currentView === 'settings') {
     return (
-      <SettingsView
-        progress={progress}
-        libraries={libraries}
-        activeLibrary={activeLibrary}
-        onUpdateProgress={handleUpdateProgress}
-        onSwitchLibrary={handleSwitchLibrary}
-        onResetLibrary={handleResetLibrary}
-        onImportCustomLibrary={handleImportCustomLibrary}
-        onBack={() => setCurrentView('practice')}
-      />
+      <>
+        <SettingsView
+          progress={progress}
+          libraries={libraries}
+          activeLibrary={activeLibrary}
+          onUpdateProgress={handleUpdateProgress}
+          onSwitchLibrary={handleSwitchLibrary}
+          onResetLibrary={handleResetLibrary}
+          onImportCustomLibrary={handleImportCustomLibrary}
+          onBack={() => setCurrentView('practice')}
+        />
+        <PwaUpdatePrompt />
+      </>
     );
   }
 
@@ -357,6 +367,9 @@ export default function App() {
 
       {/* iOS PWA 安装引导浮层：仅在 iOS Safari + 未安装时展示一次 */}
       <IOSPwaGuide enabled={progress.onboardingCompleted} />
+
+      {/* PWA 新版本提示：检测到更新时由用户确认后再应用 */}
+      <PwaUpdatePrompt />
     </div>
   );
 }

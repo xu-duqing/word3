@@ -10,7 +10,7 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: 'autoUpdate', // 自动更新 Service Worker
+        registerType: 'prompt', // 检测到更新后由用户确认再应用
         includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'masked-icon.svg'], // 需要缓存的静态资源
         manifest: {
           name: '三连背单词',       // 应用完整名称
