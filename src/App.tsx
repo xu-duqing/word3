@@ -45,7 +45,7 @@ export default function App() {
     const isDark = !!progress.darkMode;
     if (isDark) {
       document.documentElement.classList.add('dark');
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#171717');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0a0a0a');
     } else {
       document.documentElement.classList.remove('dark');
       document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f7f6f2');
