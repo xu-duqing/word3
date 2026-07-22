@@ -138,6 +138,12 @@ export const WordbookView: React.FC<WordbookViewProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={(e) => {
+              setTimeout(() => {
+                e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 200);
+            }}
+            enterKeyHint="search"
             placeholder="搜索单词或中文释义..."
             className="w-full pl-10 pr-4 py-2.5 bg-white rounded-2xl border border-neutral-200 text-xs focus:outline-hidden focus:border-neutral-400 text-neutral-800 placeholder-neutral-400 shadow-2xs"
           />

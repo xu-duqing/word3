@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, Lightbulb, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
+import { Volume2, Lightbulb, CheckCircle2, XCircle, ArrowRight, Keyboard } from 'lucide-react';
 import { Word } from '../types';
 import { speakEnglishWord, playCorrectSound, playErrorSound, playTapSound } from '../utils/sound';
 
@@ -22,9 +22,43 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
   const [usedHint, setUsedHint] = useState(false);
   const [status, setStatus] = useState<'typing' | 'correct' | 'wrong'>('typing');
   const [shake, setShake] = useState(false);
+  const [isKeyboardActive, setIsKeyboardActive] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Helper to cleanly scroll card slightly above the iOS virtual keyboard
+  const scrollToCardAboveKeyboard = () => {
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  };
+
+  // Listen to visualViewport resize/scroll to dynamically adjust position above iOS keyboard
+  useEffect(() => {
+    const handleViewportChange = () => {
+      if (document.activeElement === inputRef.current) {
+        scrollToCardAboveKeyboard();
+      }
+    };
+
+    const viewport = window.visualViewport;
+    if (viewport) {
+      viewport.addEventListener('resize', handleViewportChange);
+      viewport.addEventListener('scroll', handleViewportChange);
+    }
+
+    return () => {
+      if (viewport) {
+        viewport.removeEventListener('resize', handleViewportChange);
+        viewport.removeEventListener('scroll', handleViewportChange);
+      }
+    };
+  }, []);
 
   // Auto focus input on mount & speak if enabled
   useEffect(() => {
@@ -36,14 +70,35 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 50);
+    const triggerFocus = () => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        scrollToCardAboveKeyboard();
+      }
+    };
+
+    // Attempt multi-stage focus for various mobile browser engines
+    triggerFocus();
+    const t1 = setTimeout(triggerFocus, 80);
+    const t2 = setTimeout(triggerFocus, 250);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
+      clearTimeout(t1);
+      clearTimeout(t2);
     };
   }, [word]);
+
+  const handleInputFocus = () => {
+    setIsKeyboardActive(true);
+    // iOS keyboard takes ~300ms to animate up
+    setTimeout(scrollToCardAboveKeyboard, 100);
+    setTimeout(scrollToCardAboveKeyboard, 300);
+  };
+
+  const handleInputBlur = () => {
+    setIsKeyboardActive(false);
+  };
 
   const handleSpeak = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -95,9 +150,13 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
     }, 3000);
   };
 
-  const handleHintClick = () => {
+  const handleHintClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (status !== 'typing') return;
     playTapSound(soundEnabled);
+
+    // Re-focus input immediately
+    inputRef.current?.focus();
 
     // Mark hint as used -> counts as wrong per PRD
     setUsedHint(true);
@@ -132,7 +191,8 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
     }
   };
 
-  const handleSkipOrNext = () => {
+  const handleSkipOrNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (timerRef.current) clearTimeout(timerRef.current);
     if (status === 'wrong') {
       onAnswer(false, usedHint);
@@ -155,12 +215,20 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
     }
   };
 
+  // Explicit touch/click on card to guarantee keyboard pop-up on iOS
+  const handleCardClick = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      scrollToCardAboveKeyboard();
+    }
+  };
+
   // Render placeholders
   const renderPlaceholders = () => {
     const chars = targetWord.split('');
 
     return (
-      <div className="flex flex-wrap items-center justify-center gap-2 my-6">
+      <div className="flex flex-wrap items-center justify-center gap-2 my-6 pointer-events-none">
         {chars.map((char, index) => {
           const typedChar = inputVal[index] || '';
           const isHintRevealed = hintIndices.includes(index);
@@ -187,7 +255,6 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
           return (
             <div
               key={index}
-              onClick={() => inputRef.current?.focus()}
               className={`w-9 h-11 sm:w-11 sm:h-12 flex items-center justify-center text-xl sm:text-2xl font-mono font-bold rounded-t-lg transition-all ${borderClass} ${textClass}`}
             >
               {isHyphen ? '-' : typedChar || (isHintRevealed ? targetWord[index] : '')}
@@ -199,39 +266,45 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 py-2 select-none">
-      {/* Hidden native input for soft & physical keyboard typing */}
-      <input
-        ref={inputRef}
-        type="text"
-        value={inputVal}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        className="opacity-0 absolute -z-10 w-0 h-0 pointer-events-none"
-        autoCapitalize="none"
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-      />
-
+    <div
+      ref={cardRef}
+      className="w-full max-w-md mx-auto px-4 py-2 select-none scroll-mt-6"
+    >
       {/* Main Card */}
       <div
-        onClick={() => inputRef.current?.focus()}
-        className={`relative w-full bg-white rounded-3xl p-7 shadow-xs border border-neutral-200/80 transition-all duration-300 ${
+        onClick={handleCardClick}
+        className={`relative w-full bg-white rounded-3xl p-7 shadow-xs border border-neutral-200/80 transition-all duration-300 cursor-pointer ${
           shake ? 'animate-shake border-rose-400 shadow-rose-100' : ''
         } ${status === 'correct' ? 'border-emerald-400 bg-emerald-50/20' : ''}`}
       >
+        {/* Invisible native input placed over the card area to capture direct touches on iOS */}
+        {status === 'typing' && (
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputVal}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
+            inputMode="text"
+            enterKeyHint="go"
+            className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text rounded-3xl"
+            autoCapitalize="none"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        )}
+
         {/* Card Header: Mode badge + Hint button */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 relative z-20">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-600 bg-neutral-100 px-2.5 py-1 rounded-full">
             看中文拼单词
           </span>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleHintClick();
-            }}
+            onClick={handleHintClick}
             disabled={status !== 'typing'}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition active:scale-95 ${
               usedHint
@@ -246,7 +319,7 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
         </div>
 
         {/* Chinese Meaning & POS Display */}
-        <div className="text-center my-6 space-y-2">
+        <div className="text-center my-6 space-y-2 relative z-20">
           <div className="flex items-center justify-center gap-2">
             {word.pos && (
               <span className="text-sm font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
@@ -281,14 +354,14 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
 
         {/* Status Feedback / Next action banner */}
         {status === 'correct' && (
-          <div className="flex items-center justify-center gap-2 py-2 text-emerald-800 font-semibold text-sm animate-fade-in">
+          <div className="flex items-center justify-center gap-2 py-2 text-emerald-800 font-semibold text-sm animate-fade-in relative z-20">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 fill-emerald-100" />
             <span>拼写正确！即将跳转下一个</span>
           </div>
         )}
 
         {status === 'wrong' && (
-          <div className="space-y-3 py-1 text-center animate-fade-in">
+          <div className="space-y-3 py-1 text-center animate-fade-in relative z-20">
             <div className="flex items-center justify-center gap-2 text-rose-800 font-semibold text-sm">
               <XCircle className="w-5 h-5 text-rose-600 fill-rose-100" />
               <span>拼写错误</span>
@@ -312,11 +385,15 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
         )}
 
         {status === 'typing' && (
-          <p className="text-[11px] text-center text-neutral-600 font-medium pt-2">
-            点击卡片或直接键盘打字即可
-          </p>
+          <div className="flex items-center justify-center gap-1.5 text-[11px] text-center text-neutral-600 font-medium pt-2 relative z-20">
+            <Keyboard className={`w-3.5 h-3.5 ${isKeyboardActive ? 'text-emerald-800 animate-pulse' : 'text-neutral-600'}`} />
+            <span>
+              {isKeyboardActive ? '键盘已就绪，请输入单词' : '点击卡片唤起键盘打字'}
+            </span>
+          </div>
         )}
       </div>
     </div>
   );
 };
+
