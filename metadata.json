@@ -1,6 +1,6 @@
 {
-  "name": "极简背单词",
-  "description": "零干扰、开门见山、算法驱动的极简记忆工具",
+  "name": "三连背单词",
+  "description": "零干扰、打开即背的极简记忆工具",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
