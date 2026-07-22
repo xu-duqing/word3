@@ -29,6 +29,7 @@ export interface UserProgress {
   onboardingCompleted: boolean;
   currentStreak: number;
   lastPracticeDate?: string; // YYYY-MM-DD
+  darkMode?: boolean;
 }
 
 export interface DailyRecord {

@@ -175,7 +175,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           <div className="text-center text-[10px] text-neutral-400 pt-2">
-            极简背单词 v1.0.0 · 开门见山，零干扰背词
+            三连背单词 v1.0.0 · 开门见山，零干扰背词
           </div>
         </div>
 

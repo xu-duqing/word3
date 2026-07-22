@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronRight, Upload, RotateCcw, Volume2, Check } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Upload, RotateCcw, Volume2, Check, Moon, Sun } from 'lucide-react';
 import { Library, UserProgress } from '../types';
 import { parseCustomLibraryText } from '../utils/storage';
 
@@ -79,18 +79,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2] flex flex-col p-4 sm:p-6 select-none animate-fade-in">
+    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 flex flex-col p-4 sm:p-6 select-none animate-fade-in transition-colors duration-200">
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col space-y-6">
         {/* Navigation Header */}
         <div className="flex items-center justify-between py-2">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 rounded-full border border-neutral-200/80 text-xs font-semibold shadow-2xs transition active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 rounded-full border border-neutral-200/80 dark:border-neutral-700 text-xs font-semibold shadow-2xs transition active:scale-95"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>返回</span>
           </button>
-          <h1 className="text-base font-bold text-neutral-900">设置</h1>
+          <h1 className="text-base font-bold text-neutral-900 dark:text-neutral-100">设置</h1>
           <div className="w-12" />
         </div>
 
@@ -98,67 +98,86 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <div className="space-y-6">
           {/* Section 1: Library Management */}
           <div className="space-y-2">
-            <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-1">
+            <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider px-1">
               词库与目标
             </span>
 
-            <div className="bg-white rounded-3xl border border-neutral-200/80 divide-y divide-neutral-100 overflow-hidden shadow-2xs">
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 divide-y divide-neutral-100 dark:divide-neutral-800 overflow-hidden shadow-2xs">
               <button
                 onClick={() => setShowLibPicker(true)}
-                className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 transition"
+                className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition"
               >
                 <div>
-                  <div className="text-xs text-neutral-400 font-medium">当前词库</div>
-                  <div className="text-sm font-bold text-neutral-900 mt-0.5">
+                  <div className="text-xs text-neutral-400 dark:text-neutral-500 font-medium">当前词库</div>
+                  <div className="text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-0.5">
                     {activeLibrary?.name || '未知词库'}
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
               </button>
 
               <button
                 onClick={() => setShowImporter(true)}
-                className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 transition"
+                className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition"
               >
                 <div className="flex items-center gap-2">
-                  <Upload className="w-4 h-4 text-emerald-700" />
-                  <span className="text-sm font-semibold text-neutral-800">导入本地词库</span>
+                  <Upload className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+                  <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">导入本地词库</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
               </button>
 
               <button
                 onClick={() => setShowGoalPicker(true)}
-                className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 transition"
+                className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition"
               >
                 <div>
-                  <div className="text-xs text-neutral-400 font-medium">每日目标</div>
-                  <div className="text-sm font-bold text-neutral-900 mt-0.5">
+                  <div className="text-xs text-neutral-400 dark:text-neutral-500 font-medium">每日目标</div>
+                  <div className="text-sm font-bold text-neutral-900 dark:text-neutral-100 mt-0.5">
                     {progress.dailyGoal} 词 / 天
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
               </button>
             </div>
           </div>
 
-          {/* Section 2: Audio Preferences */}
+          {/* Section 2: Audio & Visual Preferences */}
           <div className="space-y-2">
-            <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-1">
+            <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider px-1">
               偏好设置
             </span>
 
-            <div className="bg-white rounded-3xl border border-neutral-200/80 p-4.5 space-y-4 shadow-2xs">
-              <div className="flex items-center justify-between">
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 p-4.5 space-y-4 shadow-2xs divide-y divide-neutral-100 dark:divide-neutral-800">
+              {/* Dark mode switch */}
+              <div className="flex items-center justify-between pb-1">
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-neutral-600" />
-                  <span className="text-xs font-semibold text-neutral-800">按键与音效反馈</span>
+                  {progress.darkMode ? (
+                    <Moon className="w-4 h-4 text-indigo-400" />
+                  ) : (
+                    <Sun className="w-4 h-4 text-amber-500" />
+                  )}
+                  <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">深色模式</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!progress.darkMode}
+                  onChange={(e) => onUpdateProgress({ darkMode: e.target.checked })}
+                  className="w-4 h-4 accent-[#183b2b] dark:accent-emerald-500 rounded cursor-pointer"
+                />
+              </div>
+
+              {/* Sound feedback switch */}
+              <div className="flex items-center justify-between pt-3">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                  <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">按键与音效反馈</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={progress.soundEnabled}
                   onChange={(e) => onUpdateProgress({ soundEnabled: e.target.checked })}
-                  className="w-4 h-4 accent-[#183b2b] rounded cursor-pointer"
+                  className="w-4 h-4 accent-[#183b2b] dark:accent-emerald-500 rounded cursor-pointer"
                 />
               </div>
             </div>
@@ -168,27 +187,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="space-y-2 pt-2">
             <button
               onClick={() => setShowResetConfirm(true)}
-              className="w-full p-4 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 rounded-2xl text-rose-800 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98"
+              className="w-full p-4 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200/80 dark:border-rose-900/80 rounded-2xl text-rose-800 dark:text-rose-300 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98"
             >
               <RotateCcw className="w-4 h-4" />
               <span>重置当前词库通关记录</span>
             </button>
           </div>
 
-          <div className="text-center text-[10px] text-neutral-400 pt-2">
-            极简背单词 v1.0.0 · 开门见山，零干扰背词
+          <div className="text-center text-[10px] text-neutral-400 dark:text-neutral-500 pt-2">
+            三连背单词 v1.0.0 · 开门见山，零干扰背词
           </div>
         </div>
 
         {/* Library Switcher Dialog */}
         {showLibPicker && (
-          <div className="fixed inset-0 z-60 bg-neutral-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-xs bg-white rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
+          <div className="fixed inset-0 z-60 bg-neutral-900/40 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="w-full max-w-xs bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-neutral-900 text-sm">切换激活词库</h3>
+                <h3 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">切换激活词库</h3>
                 <button
                   onClick={() => setShowLibPicker(false)}
-                  className="text-xs text-neutral-400 hover:text-neutral-700"
+                  className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                 >
                   关闭
                 </button>
@@ -206,12 +225,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       }}
                       className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs transition ${
                         isCurrent
-                          ? 'border-[#183b2b] bg-emerald-50/50 font-bold text-neutral-900'
-                          : 'border-neutral-200 hover:bg-neutral-50 text-neutral-700'
+                          ? 'border-[#183b2b] dark:border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/50 font-bold text-neutral-900 dark:text-neutral-100'
+                          : 'border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
                       }`}
                     >
                       <span>{lib.name}</span>
-                      {isCurrent && <Check className="w-4 h-4 text-[#183b2b]" />}
+                      {isCurrent && <Check className="w-4 h-4 text-[#183b2b] dark:text-emerald-400" />}
                     </button>
                   );
                 })}
@@ -222,13 +241,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
         {/* Daily Goal Picker Dialog */}
         {showGoalPicker && (
-          <div className="fixed inset-0 z-60 bg-neutral-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-xs bg-white rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
+          <div className="fixed inset-0 z-60 bg-neutral-900/40 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="w-full max-w-xs bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 shadow-2xl space-y-4 animate-scale-up">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-neutral-900 text-sm">修改每日背词目标</h3>
+                <h3 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">修改每日背词目标</h3>
                 <button
                   onClick={() => setShowGoalPicker(false)}
-                  className="text-xs text-neutral-400 hover:text-neutral-700"
+                  className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                 >
                   关闭
                 </button>
@@ -244,8 +263,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     }}
                     className={`py-3 rounded-xl border font-mono font-bold text-sm transition ${
                       progress.dailyGoal === goal
-                        ? 'bg-[#183b2b] text-white border-[#183b2b]'
-                        : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-800 border-neutral-200'
+                        ? 'bg-[#183b2b] dark:bg-emerald-600 text-white border-[#183b2b] dark:border-emerald-500'
+                        : 'bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700'
                     }`}
                   >
                     {goal} 词
@@ -258,27 +277,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
         {/* Custom Importer Dialog */}
         {showImporter && (
-          <div className="fixed inset-0 z-60 bg-neutral-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="fixed inset-0 z-60 bg-neutral-900/40 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="w-full max-w-sm bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-neutral-900 text-sm">导入自定义本地词库</h3>
+                <h3 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">导入自定义本地词库</h3>
                 <button
                   onClick={() => setShowImporter(false)}
-                  className="text-xs text-neutral-400 hover:text-neutral-700"
+                  className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                 >
                   关闭
                 </button>
               </div>
 
               {importError && (
-                <div className="p-2.5 bg-rose-50 text-rose-800 rounded-xl text-xs">
+                <div className="p-2.5 bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 rounded-xl text-xs">
                   {importError}
                 </div>
               )}
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-neutral-500 mb-1">
+                  <label className="block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mb-1">
                     词库名称
                   </label>
                   <input
@@ -286,24 +305,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     value={importName}
                     onChange={(e) => setImportName(e.target.value)}
                     placeholder="如：我的精准备考词汇"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs focus:outline-hidden focus:border-neutral-400"
+                    className="w-full px-3 py-2 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-xl text-xs focus:outline-hidden focus:border-neutral-400 dark:focus:border-neutral-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-neutral-500 mb-1">
+                  <label className="block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mb-1">
                     文件选择或文本粘贴 (.txt / .csv)
                   </label>
                   <input
                     type="file"
                     accept=".txt,.csv"
                     onChange={handleFileUpload}
-                    className="block w-full text-xs text-neutral-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-100 file:text-neutral-700 hover:file:bg-neutral-200 cursor-pointer"
+                    className="block w-full text-xs text-neutral-500 dark:text-neutral-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-100 dark:file:bg-neutral-800 file:text-neutral-700 dark:file:text-neutral-200 hover:file:bg-neutral-200 dark:hover:file:bg-neutral-700 cursor-pointer"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-neutral-500 mb-1">
+                  <label className="block text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 mb-1">
                     词汇格式（支持 "单词, 意思" 或 "word = 意思"）
                   </label>
                   <textarea
@@ -311,13 +330,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     value={importText}
                     onChange={(e) => setImportText(e.target.value)}
                     placeholder={`abandon, v. 放弃\nability, n. 能力\naccommodate = v. 容纳`}
-                    className="w-full p-3 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-hidden focus:border-neutral-400"
+                    className="w-full p-3 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-xl text-xs font-mono focus:outline-hidden focus:border-neutral-400 dark:focus:border-neutral-500"
                   />
                 </div>
 
                 <button
                   onClick={handleConfirmImport}
-                  className="w-full py-3 bg-[#183b2b] text-white font-semibold text-xs rounded-xl shadow-xs hover:bg-[#122e22] transition active:scale-98"
+                  className="w-full py-3 bg-[#183b2b] dark:bg-emerald-600 text-white font-semibold text-xs rounded-xl shadow-xs hover:bg-[#122e22] dark:hover:bg-emerald-700 transition active:scale-98"
                 >
                   确认导入词库
                 </button>
@@ -328,17 +347,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
         {/* Reset Progress Confirmation Dialog */}
         {showResetConfirm && (
-          <div className="fixed inset-0 z-60 bg-neutral-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="w-full max-w-xs bg-white rounded-3xl p-5 shadow-2xl space-y-4 text-center">
-              <h3 className="font-bold text-neutral-900 text-sm">确认重置记录？</h3>
-              <p className="text-xs text-neutral-500 leading-relaxed">
-                这将会清空当前词库 <span className="font-semibold text-neutral-800">{activeLibrary?.name}</span> 的所有连续正确次数与通关标志，重新开始通关。
+          <div className="fixed inset-0 z-60 bg-neutral-900/40 dark:bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="w-full max-w-xs bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800 rounded-3xl p-5 shadow-2xl space-y-4 text-center">
+              <h3 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">确认重置记录？</h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                这将会清空当前词库 <span className="font-semibold text-neutral-800 dark:text-neutral-200">{activeLibrary?.name}</span> 的所有连续正确次数与通关标志，重新开始通关。
               </p>
 
               <div className="flex items-center gap-2 pt-2">
                 <button
                   onClick={() => setShowResetConfirm(false)}
-                  className="flex-1 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl font-semibold text-xs transition"
+                  className="flex-1 py-2.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-xs transition"
                 >
                   取消
                 </button>

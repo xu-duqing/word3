@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @layer utilities {
   @keyframes shake {
     0%, 100% { transform: translateX(0); }

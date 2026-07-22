@@ -40,6 +40,18 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [sessionCorrectCount, setSessionCorrectCount] = useState<number>(0);
 
+  // Synchronize Dark Mode HTML class & Theme Color Meta Tag
+  useEffect(() => {
+    const isDark = !!progress.darkMode;
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#171717');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f7f6f2');
+    }
+  }, [progress.darkMode]);
+
   // Active Library
   const activeLibrary = useMemo(() => {
     return libraries.find((l) => l.id === progress.activeLibraryId) || libraries[0];
@@ -283,12 +295,14 @@ export default function App() {
 
   // Default Full Screen View: Practice Stage
   return (
-    <div className="min-h-screen bg-[#f7f6f2] text-neutral-900 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in">
+    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in transition-colors duration-200">
       {/* Top Header Navigation Bar */}
       <HeaderBar
         currentProgress={currentIndex}
         targetN={queue.length || progress.dailyGoal}
         activeLibrary={activeLibrary}
+        darkMode={progress.darkMode}
+        onToggleDarkMode={() => handleUpdateProgress({ darkMode: !progress.darkMode })}
         onOpenWordbook={() => setCurrentView('wordbook')}
         onOpenCalendar={() => setCurrentView('calendar')}
         onOpenSettings={() => setCurrentView('settings')}
@@ -327,9 +341,7 @@ export default function App() {
       </main>
 
       {/* Bottom Footer */}
-      <footer className="text-center py-3 text-[11px] text-neutral-400 select-none">
-        背词即生活 · 键盘打字 / 触摸点击均可操作
-      </footer>
+      <footer className="text-center py-2 text-[11px] text-neutral-400 select-none" />
     </div>
   );
 }

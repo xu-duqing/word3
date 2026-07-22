@@ -62,82 +62,82 @@ export const StatsCalendarView: React.FC<StatsCalendarViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2] flex flex-col p-4 sm:p-6 select-none animate-fade-in">
+    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 flex flex-col p-4 sm:p-6 select-none animate-fade-in transition-colors duration-200">
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col space-y-4">
         {/* Header Navigation */}
         <div className="flex items-center justify-between py-2">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 rounded-full border border-neutral-200/80 text-xs font-semibold shadow-2xs transition active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 rounded-full border border-neutral-200/80 dark:border-neutral-700 text-xs font-semibold shadow-2xs transition active:scale-95"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>返回</span>
           </button>
-          <h1 className="text-base font-bold text-neutral-900">打卡与统计</h1>
+          <h1 className="text-base font-bold text-neutral-900 dark:text-neutral-100">打卡与统计</h1>
           <div className="w-12" />
         </div>
 
         {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white p-4.5 rounded-2xl border border-neutral-200/80 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-xs text-amber-800 font-semibold mb-1">
+          <div className="bg-white dark:bg-neutral-900 p-4.5 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-xs text-amber-800 dark:text-amber-300 font-semibold mb-1">
               <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
               <span>连续打卡</span>
             </div>
-            <div className="text-2xl font-black text-neutral-900 font-mono">
-              {currentStreak} <span className="text-xs font-normal text-neutral-500">天</span>
+            <div className="text-2xl font-black text-neutral-900 dark:text-neutral-100 font-mono">
+              {currentStreak} <span className="text-xs font-normal text-neutral-500 dark:text-neutral-400">天</span>
             </div>
           </div>
 
-          <div className="bg-white p-4.5 rounded-2xl border border-neutral-200/80 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-xs text-emerald-800 font-semibold mb-1">
-              <BookOpen className="w-4 h-4 text-emerald-600" />
+          <div className="bg-white dark:bg-neutral-900 p-4.5 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-800 dark:text-emerald-300 font-semibold mb-1">
+              <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>累计练习</span>
             </div>
-            <div className="text-2xl font-black text-neutral-900 font-mono">
-              {totalPracticedCount.toLocaleString()} <span className="text-xs font-normal text-neutral-500">词</span>
+            <div className="text-2xl font-black text-neutral-900 dark:text-neutral-100 font-mono">
+              {totalPracticedCount.toLocaleString()} <span className="text-xs font-normal text-neutral-500 dark:text-neutral-400">词</span>
             </div>
           </div>
 
-          <div className="col-span-2 bg-white p-4.5 rounded-2xl border border-neutral-200/80 shadow-2xs flex items-center justify-between">
+          <div className="col-span-2 bg-white dark:bg-neutral-900 p-4.5 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 shadow-2xs flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-700 font-semibold mb-0.5">
-                <Target className="w-4 h-4 text-[#183b2b]" />
+              <div className="flex items-center gap-1.5 text-xs text-neutral-700 dark:text-neutral-300 font-semibold mb-0.5">
+                <Target className="w-4 h-4 text-[#183b2b] dark:text-emerald-400" />
                 <span>当前词库通关进度</span>
               </div>
-              <p className="text-[11px] text-neutral-500">{activeLibrary?.name || '默认词库'}</p>
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400">{activeLibrary?.name || '默认词库'}</p>
             </div>
-            <div className="text-2xl font-black text-[#183b2b] font-mono">
+            <div className="text-2xl font-black text-[#183b2b] dark:text-emerald-400 font-mono">
               {passPercentage.toFixed(1)}%
             </div>
           </div>
         </div>
 
         {/* Calendar Card */}
-        <div className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-2xs space-y-4">
+        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-neutral-200/80 dark:border-neutral-800 shadow-2xs space-y-4">
           {/* Month Header */}
           <div className="flex items-center justify-between">
             <button
               onClick={prevMonth}
-              className="p-1.5 hover:bg-neutral-100 rounded-xl text-neutral-600 transition"
+              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl text-neutral-600 dark:text-neutral-400 transition"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
 
-            <span className="font-bold text-neutral-900 text-base">
+            <span className="font-bold text-neutral-900 dark:text-neutral-100 text-base">
               {year}年 {monthNames[month]}
             </span>
 
             <button
               onClick={nextMonth}
-              className="p-1.5 hover:bg-neutral-100 rounded-xl text-neutral-600 transition"
+              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl text-neutral-600 dark:text-neutral-400 transition"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
           {/* Week Label Grid */}
-          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-neutral-400">
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-neutral-400 dark:text-neutral-500">
             {weekLabels.map((lbl, idx) => (
               <div key={idx} className="py-1">
                 {lbl}
@@ -166,10 +166,10 @@ export const StatsCalendarView: React.FC<StatsCalendarViewProps> = ({
                   onClick={() => handleDayClick(dayNum)}
                   className={`h-9 rounded-full flex items-center justify-center text-xs font-bold transition active:scale-90 relative ${
                     isGoalReached
-                      ? 'bg-[#183b2b] text-white shadow-2xs'
+                      ? 'bg-[#183b2b] dark:bg-emerald-600 text-white shadow-2xs'
                       : hasPracticed
-                      ? 'bg-emerald-100 text-emerald-900'
-                      : 'text-neutral-700 hover:bg-neutral-100'
+                      ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200'
+                      : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                   }`}
                 >
                   {dayNum}
@@ -184,11 +184,11 @@ export const StatsCalendarView: React.FC<StatsCalendarViewProps> = ({
 
         {/* Selected Day Summary */}
         {selectedDayDetail && (
-          <div className="bg-white rounded-2xl p-4 border border-neutral-200/80 shadow-2xs text-xs space-y-2 animate-fade-in">
-            <div className="flex items-center justify-between font-bold text-neutral-900 border-b border-neutral-100 pb-2">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-200/80 dark:border-neutral-800 shadow-2xs text-xs space-y-2 animate-fade-in">
+            <div className="flex items-center justify-between font-bold text-neutral-900 dark:text-neutral-100 border-b border-neutral-100 dark:border-neutral-800 pb-2">
               <span>{selectedDayDetail.date} 练习记录</span>
               {selectedDayDetail.goalReached && (
-                <span className="text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1 font-semibold">
+                <span className="text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1 font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   打卡成功
                 </span>
@@ -196,10 +196,10 @@ export const StatsCalendarView: React.FC<StatsCalendarViewProps> = ({
             </div>
 
             {selectedDayDetail.wordsPracticed > 0 ? (
-              <div className="grid grid-cols-2 gap-2 pt-1 text-neutral-600">
-                <div>已背单词：<span className="font-bold text-neutral-900">{selectedDayDetail.wordsPracticed} 个</span></div>
+              <div className="grid grid-cols-2 gap-2 pt-1 text-neutral-600 dark:text-neutral-400">
+                <div>已背单词：<span className="font-bold text-neutral-900 dark:text-neutral-100">{selectedDayDetail.wordsPracticed} 个</span></div>
                 <div>正确率：
-                  <span className="font-bold text-neutral-900">
+                  <span className="font-bold text-neutral-900 dark:text-neutral-100">
                     {selectedDayDetail.totalAttempts > 0
                       ? Math.round((selectedDayDetail.correctCount / selectedDayDetail.totalAttempts) * 100)
                       : 0}%
@@ -207,7 +207,7 @@ export const StatsCalendarView: React.FC<StatsCalendarViewProps> = ({
                 </div>
               </div>
             ) : (
-              <p className="text-neutral-400 py-1">该日暂无练习记录</p>
+              <p className="text-neutral-400 dark:text-neutral-500 py-1">该日暂无练习记录</p>
             )}
           </div>
         )}

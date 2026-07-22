@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, Lightbulb, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
+import { Volume2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { Word } from '../types';
 import { speakEnglishWord, playCorrectSound, playErrorSound, playTapSound } from '../utils/sound';
 import { VirtualKeyboard } from './VirtualKeyboard';
@@ -198,17 +198,17 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
             return <div key={index} className="w-4 h-10" />;
           }
 
-          let borderClass = 'border-b-2 border-neutral-300';
-          let textClass = 'text-neutral-900';
+          let borderClass = 'border-b-2 border-neutral-300 dark:border-neutral-700';
+          let textClass = 'text-neutral-900 dark:text-neutral-100';
 
           if (status === 'correct') {
-            borderClass = 'border-b-2 border-emerald-500 bg-emerald-50/60 text-emerald-900';
+            borderClass = 'border-b-2 border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-200';
           } else if (status === 'wrong') {
-            borderClass = 'border-b-2 border-rose-500 bg-rose-50/60 text-rose-900';
+            borderClass = 'border-b-2 border-rose-500 bg-rose-50/60 dark:bg-rose-950/50 text-rose-900 dark:text-rose-200';
           } else if (typedChar) {
-            borderClass = 'border-b-2 border-neutral-800 font-semibold';
+            borderClass = 'border-b-2 border-neutral-800 dark:border-neutral-200 font-semibold';
           } else if (isHintRevealed) {
-            borderClass = 'border-b-2 border-amber-400 bg-amber-50/50 text-amber-900';
+            borderClass = 'border-b-2 border-amber-400 bg-amber-50/50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200';
           }
 
           return (
@@ -228,55 +228,29 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
     <div className="w-full max-w-md mx-auto px-2 sm:px-4 py-2 select-none">
       {/* Main Card */}
       <div
-        className={`relative w-full bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-neutral-200/80 transition-all duration-300 ${
-          shake ? 'animate-shake border-rose-400 shadow-rose-100' : ''
-        } ${status === 'correct' ? 'border-emerald-400 bg-emerald-50/20' : ''}`}
+        className={`relative w-full bg-white dark:bg-neutral-900 rounded-3xl p-6 sm:p-7 shadow-xs border border-neutral-200/80 dark:border-neutral-800 transition-all duration-300 ${
+          shake ? 'animate-shake border-rose-400 shadow-rose-100 dark:shadow-rose-950' : ''
+        } ${status === 'correct' ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/20 dark:bg-emerald-950/20' : ''}`}
       >
-        {/* Card Header: Mode badge + Hint button */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-600 bg-neutral-100 px-2.5 py-1 rounded-full">
-            看中文拼单词
-          </span>
-
-          <button
-            onClick={handleHintClick}
-            disabled={status !== 'typing'}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition active:scale-95 ${
-              usedHint
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
-            }`}
-            title="提示会透露 1 个字母，且视同答错"
-          >
-            <Lightbulb className={`w-3.5 h-3.5 ${usedHint ? 'fill-amber-500 text-amber-600' : ''}`} />
-            <span>提示</span>
-          </button>
-        </div>
-
         {/* Chinese Meaning & POS Display */}
-        <div className="text-center my-4 space-y-2">
+        <div className="text-center my-3 space-y-1.5">
           <div className="flex items-center justify-center gap-2">
             {word.pos && (
-              <span className="text-sm font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+              <span className="text-sm font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md">
                 {word.pos}
               </span>
             )}
-            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 leading-snug">
+            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100 leading-snug">
               {word.meaning}
             </h2>
           </div>
 
-          <p className="text-xs text-neutral-600 font-normal">
-            这个单词有 <span className="font-semibold text-neutral-800">{wordLength}</span> 个字母
-            {usedHint && <span className="text-amber-800 ml-1">(已使用提示，本次计错)</span>}
-          </p>
-
           {word.phonetic && (
-            <div className="flex items-center justify-center gap-1.5 text-xs text-neutral-600 pt-1">
+            <div className="flex items-center justify-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400 pt-0.5">
               <span>{word.phonetic}</span>
               <button
                 onClick={handleSpeak}
-                className="p-1 hover:bg-neutral-100 rounded-full transition text-neutral-600 hover:text-neutral-900"
+                className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
               >
                 <Volume2 className="w-3.5 h-3.5" />
               </button>
@@ -289,29 +263,29 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
 
         {/* Status Feedback / Next action banner */}
         {status === 'correct' && (
-          <div className="flex items-center justify-center gap-2 py-2 text-emerald-800 font-semibold text-sm animate-fade-in">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 fill-emerald-100" />
+          <div className="flex items-center justify-center gap-2 py-2 text-emerald-800 dark:text-emerald-300 font-semibold text-sm animate-fade-in">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 fill-emerald-100 dark:fill-emerald-950" />
             <span>拼写正确！即将跳转下一个</span>
           </div>
         )}
 
         {status === 'wrong' && (
           <div className="space-y-3 py-1 text-center animate-fade-in">
-            <div className="flex items-center justify-center gap-2 text-rose-800 font-semibold text-sm">
-              <XCircle className="w-5 h-5 text-rose-600 fill-rose-100" />
+            <div className="flex items-center justify-center gap-2 text-rose-800 dark:text-rose-300 font-semibold text-sm">
+              <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 fill-rose-100 dark:fill-rose-950" />
               <span>拼写错误</span>
             </div>
 
-            <div className="bg-rose-50 border border-rose-200/80 rounded-2xl p-3 text-center">
-              <p className="text-xs text-rose-800 mb-1 font-medium">正确拼写：</p>
-              <p className="text-xl font-mono font-bold text-rose-900 tracking-wider">
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 rounded-2xl p-3 text-center">
+              <p className="text-xs text-rose-800 dark:text-rose-300 mb-1 font-medium">正确拼写：</p>
+              <p className="text-xl font-mono font-bold text-rose-900 dark:text-rose-200 tracking-wider">
                 {targetWord}
               </p>
             </div>
 
             <button
               onClick={handleSkipOrNext}
-              className="w-full mt-2 py-2.5 bg-neutral-900 text-white hover:bg-neutral-800 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition active:scale-98"
+              className="w-full mt-2 py-2.5 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition active:scale-98"
             >
               <span>立即继续</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -321,15 +295,23 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
       </div>
 
       {/* Built-in Custom Virtual Keyboard (Zero iOS OS Keyboard Glitches) */}
-      <VirtualKeyboard
-        onKeyPress={handleKeyPress}
-        onBackspace={handleBackspace}
-        onEnter={status === 'typing' ? () => checkAnswer(inputVal) : handleSkipOrNext}
-        onHint={handleHintClick}
-        disabled={status !== 'typing'}
-        usedHint={usedHint}
-        activeKey={activePhysicalKey}
-      />
+      <div
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          status === 'typing'
+            ? 'max-h-[320px] opacity-100 mt-4 scale-100'
+            : 'max-h-0 opacity-0 mt-0 scale-95 pointer-events-none'
+        }`}
+      >
+        <VirtualKeyboard
+          onKeyPress={handleKeyPress}
+          onBackspace={handleBackspace}
+          onEnter={() => checkAnswer(inputVal)}
+          onHint={handleHintClick}
+          disabled={status !== 'typing'}
+          usedHint={usedHint}
+          activeKey={activePhysicalKey}
+        />
+      </div>
     </div>
   );
 };
