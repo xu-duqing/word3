@@ -16,8 +16,8 @@ export default defineConfig(() => {
           name: '三连背单词',       // 应用完整名称
           short_name: 'Word3',             // 桌面上显示的简称
           description: '零干扰、打开即背的极简记忆工具',
-          theme_color: '#ffffff',          // 状态栏/顶部主题颜色
-          background_color: '#ffffff',     // 启动屏背景色
+          theme_color: '#183b2b',          // 状态栏/顶部主题颜色
+          background_color: '#183b2b',     // 启动屏背景色
           display: 'standalone',           // 独立应用模式（隐藏浏览器地址栏）
           icons: [
             {
