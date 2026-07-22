@@ -16,16 +16,16 @@ export function generateDailyPool(allWords: Word[], targetN: number): PracticeCa
   const targetUnmasteredCount = Math.min(Math.round(targetN * 0.8), unmastered.length);
   const targetMasteredCount = Math.min(targetN - targetUnmasteredCount, mastered.length);
 
-  // 1. Sort Unmastered: least count_practiced first, then highest error_count
-  const sortedUnmastered = [...unmastered].sort((a, b) => {
+  // 1. Shuffle unmastered first so candidates with equal priority (e.g. count_practiced = 0) are chosen randomly
+  const sortedUnmastered = shuffleArray(unmastered).sort((a, b) => {
     if (a.count_practiced !== b.count_practiced) {
       return a.count_practiced - b.count_practiced;
     }
     return b.error_count - a.error_count;
   });
 
-  // 2. Sort Mastered: longest time since last practice (undefined or smallest timestamp)
-  const sortedMastered = [...mastered].sort((a, b) => {
+  // 2. Shuffle mastered first so candidates with equal time/priority are chosen randomly
+  const sortedMastered = shuffleArray(mastered).sort((a, b) => {
     const aTime = a.last_practiced_at || 0;
     const bTime = b.last_practiced_at || 0;
     return aTime - bTime;
@@ -41,7 +41,7 @@ export function generateDailyPool(allWords: Word[], targetN: number): PracticeCa
 
   if (remainingNeeded > 0) {
     const selectedIds = new Set(selectedPool.map((w) => w.id));
-    const unselectedWords = allWords.filter((w) => !selectedIds.has(w.id));
+    const unselectedWords = shuffleArray(allWords.filter((w) => !selectedIds.has(w.id)));
 
     // Sort remaining by priority (unmastered first, then oldest practiced)
     unselectedWords.sort((a, b) => {

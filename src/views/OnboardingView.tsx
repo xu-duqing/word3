@@ -15,7 +15,7 @@ export const OnboardingView: React.FC<OnboardingViewProps> = ({
   onCustomImportRequest,
 }) => {
   const [step, setStep] = useState<1 | 2>(1);
-  const [selectedLibId, setSelectedLibId] = useState<string>('kaoyan');
+  const [selectedLibId, setSelectedLibId] = useState<string>(libraries[0]?.id || 'core3000');
   const [dailyGoal, setDailyGoal] = useState<number>(20);
 
   const goalOptions = [10, 20, 30, 50, 100, 200];

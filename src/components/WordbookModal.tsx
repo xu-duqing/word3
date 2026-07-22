@@ -7,6 +7,7 @@ interface WordbookModalProps {
   words: Word[];
   activeLibrary?: Library;
   soundEnabled: boolean;
+  todayWordIds?: Set<string>;
   onClose: () => void;
 }
 
@@ -14,6 +15,7 @@ export const WordbookModal: React.FC<WordbookModalProps> = ({
   words,
   activeLibrary,
   soundEnabled,
+  todayWordIds,
   onClose,
 }) => {
   const [filterTab, setFilterTab] = useState<'all' | 'learning' | 'passed'>('all');
@@ -26,7 +28,13 @@ export const WordbookModal: React.FC<WordbookModalProps> = ({
   // Filter words
   const filteredWords = words.filter((w) => {
     // Tab filter
-    if (filterTab === 'learning' && (w.is_passed || w.streak_correct >= 3)) return false;
+    if (filterTab === 'learning') {
+      if (todayWordIds && todayWordIds.size > 0) {
+        if (!todayWordIds.has(w.id)) return false;
+      } else if (w.is_passed || w.streak_correct >= 3) {
+        return false;
+      }
+    }
     if (filterTab === 'passed' && !w.is_passed && w.streak_correct < 3) return false;
 
     // Search query
@@ -40,6 +48,49 @@ export const WordbookModal: React.FC<WordbookModalProps> = ({
     }
     return true;
   });
+
+  const isPracticedToday = (lastPracticedAt?: number) => {
+    if (!lastPracticedAt) return false;
+    const d = new Date(lastPracticedAt);
+    const now = new Date();
+    return (
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
+    );
+  };
+
+  const renderWordStatusBadge = (item: Word) => {
+    const isFullyPassed = item.is_passed || item.streak_correct >= 3;
+    const isTodayPassed = !isFullyPassed && item.last_practiced_at && isPracticedToday(item.last_practiced_at) && item.streak_correct > 0;
+
+    if (isFullyPassed) {
+      return (
+        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+          完全通过
+        </span>
+      );
+    }
+    if (isTodayPassed) {
+      return (
+        <span className="text-[10px] font-semibold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">
+          今日已过关
+        </span>
+      );
+    }
+    if (item.count_practiced > 0) {
+      return (
+        <span className="text-[10px] font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+          学习中
+        </span>
+      );
+    }
+    return (
+      <span className="text-[10px] text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">
+        未开始
+      </span>
+    );
+  };
 
   const renderStreakDots = (streak: number) => {
     const dots = [0, 1, 2];
@@ -174,11 +225,14 @@ export const WordbookModal: React.FC<WordbookModalProps> = ({
                   <p className="text-xs text-neutral-500 line-clamp-1">{item.meaning}</p>
                 </div>
 
-                <div className="text-right space-y-1 shrink-0 ml-3">
-                  {renderStreakDots(item.streak_correct)}
-                  <p className="text-[10px] text-neutral-400">
-                    {item.count_practiced > 0 ? `已练 ${item.count_practiced} 次` : '未开始'}
-                  </p>
+                <div className="text-right space-y-1.5 shrink-0 ml-3 flex flex-col items-end">
+                  {renderWordStatusBadge(item)}
+                  <div className="flex items-center gap-1.5">
+                    {renderStreakDots(item.streak_correct)}
+                    <span className="text-[10px] text-neutral-400 font-mono">
+                      {item.count_practiced > 0 ? `${item.count_practiced}次` : ''}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))

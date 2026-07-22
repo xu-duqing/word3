@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Word, Library, UserProgress, PracticeCard, DailyRecord } from './types';
 import {
   loadUserProgress,
@@ -9,7 +9,8 @@ import {
   saveWordsForLibrary,
   resetLibraryProgress,
   loadDailyLogs,
-  logPracticeSession,
+  recordSingleAnswer,
+  markTodayGoalCompleted,
 } from './utils/storage';
 import { generateDailyPool } from './utils/algorithm';
 import { HeaderBar } from './components/HeaderBar';
@@ -57,13 +58,7 @@ export default function App() {
     return libraries.find((l) => l.id === progress.activeLibraryId) || libraries[0];
   }, [libraries, progress.activeLibraryId]);
 
-  // Load words when active library changes
-  useEffect(() => {
-    if (activeLibrary) {
-      const loaded = loadWordsForLibrary(activeLibrary.id);
-      setWords(loaded);
-    }
-  }, [activeLibrary]);
+  const loadedLibraryIdRef = useRef<string | null>(null);
 
   // Function to build fresh daily queue
   const initQueue = useCallback((wordList: Word[], goal: number) => {
@@ -74,12 +69,17 @@ export default function App() {
     setSessionCorrectCount(0);
   }, []);
 
-  // Generate queue on initial load or library load
+  // Generate queue and load words when active library changes or on initial load
   useEffect(() => {
-    if (words.length > 0 && progress.onboardingCompleted) {
-      initQueue(words, progress.dailyGoal);
+    if (!progress.onboardingCompleted || !activeLibrary) return;
+
+    if (loadedLibraryIdRef.current !== activeLibrary.id || queue.length === 0) {
+      loadedLibraryIdRef.current = activeLibrary.id;
+      const loadedWords = loadWordsForLibrary(activeLibrary.id);
+      setWords(loadedWords);
+      initQueue(loadedWords, progress.dailyGoal);
     }
-  }, [words, progress.onboardingCompleted, progress.dailyGoal, initQueue]);
+  }, [activeLibrary, progress.onboardingCompleted, progress.dailyGoal, initQueue, queue.length]);
 
   // Onboarding completion
   const handleOnboardingComplete = (selectedLibId: string, goal: number) => {
@@ -106,11 +106,11 @@ export default function App() {
     const currentCard = queue[currentIndex];
     const targetWord = currentCard.word;
 
-    // Actual correctness rule: Correct AND no hint used -> streak + 1
-    const actualCorrect = isCorrect && !usedHint;
+    // A card is considered answered correctly if choice/spelling was correct
+    const isAnswerCorrect = isCorrect;
 
     // 1. Update session stats
-    if (actualCorrect) {
+    if (isAnswerCorrect) {
       setSessionCorrectCount((prev) => prev + 1);
     }
 
@@ -118,11 +118,11 @@ export default function App() {
     const updatedWords = words.map((w) => {
       if (w.id === targetWord.id) {
         const newCountPracticed = w.count_practiced + 1;
-        let newStreak = actualCorrect ? w.streak_correct + 1 : 0;
+        let newStreak = isAnswerCorrect ? w.streak_correct + 1 : 0;
         if (newStreak > 3) newStreak = 3;
 
         const isPassedNow = newStreak >= 3;
-        const newErrorCount = actualCorrect ? w.error_count : w.error_count + 1;
+        const newErrorCount = isAnswerCorrect ? w.error_count : w.error_count + 1;
 
         return {
           ...w,
@@ -139,23 +139,28 @@ export default function App() {
     setWords(updatedWords);
     saveWordsForLibrary(activeLibrary.id, updatedWords);
 
-    // 3. Move to next card
+    // 3. Queue update: If answered incorrectly, re-insert card so user must answer it correctly once today
+    let nextQueue = queue;
+    if (!isAnswerCorrect) {
+      nextQueue = [...queue, currentCard];
+      setQueue(nextQueue);
+    }
+
+    // 4. Move to next card
     const nextIdx = currentIndex + 1;
     setCurrentIndex(nextIdx);
 
-    // 4. If session completed
-    if (nextIdx >= queue.length) {
-      const { updatedStreak } = logPracticeSession(
-        queue.length,
-        actualCorrect ? sessionCorrectCount + 1 : sessionCorrectCount,
-        progress.dailyGoal
-      );
+    const isSessionCompleted = nextIdx >= nextQueue.length;
 
-      setDailyLogs(loadDailyLogs());
-      setProgress((prev) => ({
-        ...prev,
-        currentStreak: updatedStreak,
-      }));
+    // 5. Record in daily logs on EVERY answer attempt
+    const { updatedStreak } = recordSingleAnswer(isAnswerCorrect, progress.dailyGoal, isSessionCompleted);
+    const newLogs = loadDailyLogs();
+    setDailyLogs(newLogs);
+
+    if (updatedStreak !== progress.currentStreak) {
+      const updatedProgress = { ...progress, currentStreak: updatedStreak };
+      setProgress(updatedProgress);
+      saveUserProgress(updatedProgress);
     }
   };
 
@@ -239,6 +244,11 @@ export default function App() {
     return words.length > 0 ? (passedWordsCount / words.length) * 100 : 0;
   }, [passedWordsCount, words.length]);
 
+  // Unique word IDs in today's daily pool
+  const todayWordIds = useMemo(() => {
+    return new Set(queue.map((card) => card.word.id));
+  }, [queue]);
+
   const isSessionFinished = currentIndex >= queue.length && queue.length > 0;
   const currentCard = queue[currentIndex];
 
@@ -273,6 +283,7 @@ export default function App() {
         words={words}
         activeLibrary={activeLibrary}
         soundEnabled={progress.soundEnabled}
+        todayWordIds={todayWordIds}
         onBack={() => setCurrentView('practice')}
       />
     );
@@ -298,8 +309,8 @@ export default function App() {
     <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in">
       {/* Top Header Navigation Bar */}
       <HeaderBar
-        currentProgress={currentIndex}
-        targetN={queue.length || progress.dailyGoal}
+        currentProgress={sessionCorrectCount}
+        targetN={progress.dailyGoal}
         activeLibrary={activeLibrary}
         darkMode={progress.darkMode}
         onToggleDarkMode={() => handleUpdateProgress({ darkMode: !progress.darkMode })}

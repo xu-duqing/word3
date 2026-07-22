@@ -135,6 +135,22 @@ export const StatsCalendarModal: React.FC<StatsCalendarModalProps> = ({
             </button>
           </div>
 
+          {/* Status Legend */}
+          <div className="flex items-center justify-center gap-5 text-xs font-medium text-neutral-600 pb-2 border-b border-neutral-100">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-neutral-300" />
+              <span>未打卡</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span>打卡中</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <span>打卡完成</span>
+            </div>
+          </div>
+
           {/* Week Label Grid */}
           <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-neutral-400">
             {weekLabels.map((lbl, idx) => (
@@ -145,10 +161,10 @@ export const StatsCalendarModal: React.FC<StatsCalendarModalProps> = ({
           </div>
 
           {/* Day Grid */}
-          <div className="grid grid-cols-7 gap-1 text-center">
+          <div className="grid grid-cols-7 gap-1.5 text-center">
             {/* Empty offset */}
             {Array.from({ length: firstDayOfWeek }).map((_, idx) => (
-              <div key={`empty-${idx}`} className="h-8" />
+              <div key={`empty-${idx}`} className="h-10" />
             ))}
 
             {/* Days */}
@@ -159,22 +175,25 @@ export const StatsCalendarModal: React.FC<StatsCalendarModalProps> = ({
               const isGoalReached = record?.goalReached;
               const hasPracticed = record && record.wordsPracticed > 0;
 
+              let bgClasses = 'bg-neutral-100/70 text-neutral-700 hover:bg-neutral-200';
+              let dotClass = 'bg-neutral-300';
+
+              if (isGoalReached) {
+                bgClasses = 'bg-[#183b2b] text-white font-bold shadow-2xs';
+                dotClass = 'bg-emerald-400';
+              } else if (hasPracticed) {
+                bgClasses = 'bg-amber-100/90 text-amber-900 border border-amber-300/80 font-bold';
+                dotClass = 'bg-amber-500';
+              }
+
               return (
                 <button
                   key={dayNum}
                   onClick={() => handleDayClick(dayNum)}
-                  className={`h-8 rounded-full flex items-center justify-center text-xs font-semibold transition active:scale-90 relative ${
-                    isGoalReached
-                      ? 'bg-[#183b2b] text-white shadow-2xs font-bold'
-                      : hasPracticed
-                      ? 'bg-emerald-100 text-emerald-900'
-                      : 'text-neutral-700 hover:bg-neutral-100'
-                  }`}
+                  className={`h-10 rounded-2xl flex flex-col items-center justify-center text-xs transition active:scale-90 relative gap-0.5 ${bgClasses}`}
                 >
-                  {dayNum}
-                  {isGoalReached && (
-                    <span className="absolute -bottom-0.5 w-1 h-1 bg-amber-400 rounded-full" />
-                  )}
+                  <span className="leading-none">{dayNum}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
                 </button>
               );
             })}
@@ -186,10 +205,20 @@ export const StatsCalendarModal: React.FC<StatsCalendarModalProps> = ({
           <div className="mt-4 bg-white rounded-2xl p-4 border border-neutral-200/80 shadow-2xs text-xs space-y-2 animate-fade-in">
             <div className="flex items-center justify-between font-bold text-neutral-900 border-b border-neutral-100 pb-2">
               <span>{selectedDayDetail.date} 练习记录</span>
-              {selectedDayDetail.goalReached && (
-                <span className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  打卡成功
+              {selectedDayDetail.goalReached ? (
+                <span className="text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1 font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  打卡完成
+                </span>
+              ) : selectedDayDetail.wordsPracticed > 0 ? (
+                <span className="text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1 font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  打卡中
+                </span>
+              ) : (
+                <span className="text-neutral-500 bg-neutral-100 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1 font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                  未打卡
                 </span>
               )}
             </div>

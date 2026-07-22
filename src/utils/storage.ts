@@ -21,13 +21,19 @@ export function loadUserProgress(): UserProgress {
   const raw = localStorage.getItem(KEYS.USER_PROGRESS);
   if (raw) {
     try {
-      return JSON.parse(raw);
+      const progress: UserProgress = JSON.parse(raw);
+      const libs = loadLibraries();
+      if (!libs.some((l) => l.id === progress.activeLibraryId)) {
+        progress.activeLibraryId = 'core3000';
+        saveUserProgress(progress);
+      }
+      return progress;
     } catch {
       // Fallback
     }
   }
   return {
-    activeLibraryId: 'kaoyan',
+    activeLibraryId: 'core3000',
     dailyGoal: 20,
     soundEnabled: true,
     autoSpeechEnabled: false,
@@ -45,7 +51,13 @@ export function loadLibraries(): Library[] {
   if (raw) {
     try {
       const parsed: Library[] = JSON.parse(raw);
-      if (parsed && parsed.length > 0) return parsed;
+      if (parsed && parsed.length > 0) {
+        // Keep user's custom imported libraries and replace built-ins with the new core3000
+        const customLibs = parsed.filter((l) => l.isCustom);
+        const merged = [...BUILT_IN_LIBRARIES, ...customLibs];
+        saveLibraries(merged);
+        return merged;
+      }
     } catch {
       // Fallback
     }
@@ -73,7 +85,8 @@ export function loadWordsForLibrary(libraryId: string): Word[] {
 
   // Generate initial words from built-in template
   const initial = getInitialWordsForLibrary(libraryId);
-  const fullWords: Word[] = initial.map((item) => ({
+  const fullWords: Word[] = initial.map((item, idx) => ({
+    id: (item as any).id || `${libraryId}_${idx}`,
     ...item,
     count_practiced: 0,
     streak_correct: 0,
@@ -118,6 +131,102 @@ export function loadDailyLogs(): Record<string, DailyRecord> {
 
 export function saveDailyLogs(logs: Record<string, DailyRecord>): void {
   localStorage.setItem(KEYS.DAILY_LOGS, JSON.stringify(logs));
+}
+
+export function recordSingleAnswer(
+  isCorrect: boolean,
+  goal: number,
+  isSessionCompleted: boolean = false
+): { updatedStreak: number } {
+  const today = getTodayDateString();
+  const logs = loadDailyLogs();
+  const progress = loadUserProgress();
+
+  const existingToday = logs[today] || {
+    date: today,
+    wordsPracticed: 0,
+    correctCount: 0,
+    totalAttempts: 0,
+    goalReached: false,
+  };
+
+  const newWordsPracticed = existingToday.wordsPracticed + 1;
+  const newCorrect = existingToday.correctCount + (isCorrect ? 1 : 0);
+  const newTotalAttempts = existingToday.totalAttempts + 1;
+  const wasGoalReached = existingToday.goalReached;
+
+  const isGoalReachedNow =
+    wasGoalReached || isSessionCompleted || newWordsPracticed >= goal || newCorrect >= goal;
+
+  logs[today] = {
+    date: today,
+    wordsPracticed: newWordsPracticed,
+    correctCount: newCorrect,
+    totalAttempts: newTotalAttempts,
+    goalReached: isGoalReachedNow,
+  };
+
+  saveDailyLogs(logs);
+
+  // Update consecutive streak
+  let streak = progress.currentStreak || 0;
+  if (!wasGoalReached && isGoalReachedNow) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+    if (progress.lastPracticeDate === yStr || streak === 0) {
+      streak += 1;
+    } else if (progress.lastPracticeDate !== today) {
+      streak = 1;
+    }
+    progress.lastPracticeDate = today;
+    progress.currentStreak = streak;
+    saveUserProgress(progress);
+  }
+
+  return { updatedStreak: progress.currentStreak };
+}
+
+export function markTodayGoalCompleted(goal: number): { updatedStreak: number } {
+  const today = getTodayDateString();
+  const logs = loadDailyLogs();
+  const progress = loadUserProgress();
+
+  const existingToday = logs[today] || {
+    date: today,
+    wordsPracticed: 0,
+    correctCount: 0,
+    totalAttempts: 0,
+    goalReached: false,
+  };
+
+  const wasGoalReached = existingToday.goalReached;
+
+  logs[today] = {
+    ...existingToday,
+    goalReached: true,
+  };
+
+  saveDailyLogs(logs);
+
+  let streak = progress.currentStreak || 0;
+  if (!wasGoalReached) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+    if (progress.lastPracticeDate === yStr || streak === 0) {
+      streak += 1;
+    } else if (progress.lastPracticeDate !== today) {
+      streak = 1;
+    }
+    progress.lastPracticeDate = today;
+    progress.currentStreak = streak;
+    saveUserProgress(progress);
+  }
+
+  return { updatedStreak: progress.currentStreak };
 }
 
 export function logPracticeSession(wordsCount: number, correctCount: number, goal: number): { updatedStreak: number } {

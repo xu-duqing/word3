@@ -22,7 +22,7 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
 }) => {
   const row1 = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
   const row2 = ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
-  const row3 = ['z', 'x', 'c', 'v', 'b', 'n', 'm', '-'];
+  const row3 = ['-', 'z', 'x', 'c', 'v', 'b', 'n', 'm'];
 
   const isKeyActive = (keyStr: string) => {
     return activeKey?.toLowerCase() === keyStr.toLowerCase();
@@ -72,19 +72,6 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
 
       {/* Row 3 */}
       <div className="flex justify-center gap-1 sm:gap-1.5 mb-1.5">
-        {/* Backspace */}
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={(e) => handleTouch(e, onBackspace)}
-          className={`flex-[1.4] min-w-[38px] max-w-[50px] h-11 sm:h-12 bg-neutral-200/80 dark:bg-neutral-800/90 rounded-lg text-neutral-700 dark:text-neutral-200 shadow-2xs border border-neutral-300/60 dark:border-neutral-700/80 flex items-center justify-center transition-all duration-75 active:scale-95 active:bg-neutral-300 dark:active:bg-neutral-700 ${
-            isKeyActive('Backspace') ? 'bg-rose-200 dark:bg-rose-900/60 border-rose-400 scale-95' : ''
-          } ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-neutral-300/80 dark:hover:bg-neutral-700'}`}
-          aria-label="退格"
-        >
-          <Delete className="w-5 h-5 text-neutral-700 dark:text-neutral-200" />
-        </button>
-
         {row3.map((char) => (
           <button
             key={char}
@@ -98,6 +85,19 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
             {char === '-' ? '-' : char.toUpperCase()}
           </button>
         ))}
+
+        {/* Backspace */}
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={(e) => handleTouch(e, onBackspace)}
+          className={`flex-[1.4] min-w-[38px] max-w-[50px] h-11 sm:h-12 bg-neutral-200/80 dark:bg-neutral-800/90 rounded-lg text-neutral-700 dark:text-neutral-200 shadow-2xs border border-neutral-300/60 dark:border-neutral-700/80 flex items-center justify-center transition-all duration-75 active:scale-95 active:bg-neutral-300 dark:active:bg-neutral-700 ${
+            isKeyActive('Backspace') ? 'bg-rose-200 dark:bg-rose-900/60 border-rose-400 scale-95' : ''
+          } ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-neutral-300/80 dark:hover:bg-neutral-700'}`}
+          aria-label="退格"
+        >
+          <Delete className="w-5 h-5 text-neutral-700 dark:text-neutral-200" />
+        </button>
       </div>
 
       {/* Row 4: Control keys (Hint, Space, Enter) */}
