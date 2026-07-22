@@ -11,7 +11,7 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate', // 自动更新 Service Worker
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'], // 需要缓存的静态资源
+        includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'masked-icon.svg'], // 需要缓存的静态资源
         manifest: {
           name: '三连背单词',       // 应用完整名称
           short_name: 'Word3',             // 桌面上显示的简称
@@ -21,8 +21,18 @@ export default defineConfig(() => {
           display: 'standalone',           // 独立应用模式（隐藏浏览器地址栏）
           icons: [
             {
+              src: 'pwa-192.png',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
               src: 'pwa-192x192.png',
               sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: 'pwa-512.png',
+              sizes: '512x512',
               type: 'image/png'
             },
             {
@@ -31,7 +41,7 @@ export default defineConfig(() => {
               type: 'image/png'
             },
             {
-              src: 'pwa-512x512.png',
+              src: 'pwa-maskable.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable'
