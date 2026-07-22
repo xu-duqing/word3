@@ -88,11 +88,6 @@ export const SpellingCard: React.FC<SpellingCardProps> = ({
     speakEnglishWord(targetWord, soundEnabled);
 
     setTimeout(() => setShake(false), 500);
-
-    // Auto advance after 3 seconds or user can click
-    timerRef.current = setTimeout(() => {
-      onAnswer(false, usedHint);
-    }, 3000);
   };
 
   const handleHintClick = () => {

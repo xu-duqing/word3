@@ -57,13 +57,9 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
         onAnswer(true);
       }, 400);
     } else {
-      // Wrong
+      // Wrong: play sound and wait for manual user advance
       setStatus('wrong');
       playErrorSound(soundEnabled);
-
-      timerRef.current = setTimeout(() => {
-        onAnswer(false);
-      }, 3000);
     }
   };
 
@@ -75,6 +71,17 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
       onAnswer(true);
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (status === 'wrong' && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        handleSkipOrNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [status]);
 
   return (
     <div className="w-full max-w-md mx-auto px-4 py-2 select-none">
@@ -161,7 +168,8 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
               onClick={handleSkipOrNext}
               className="w-full py-2.5 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition active:scale-98"
             >
-              <span>即刻跳转</span>
+              <XCircle className="w-4 h-4 text-rose-500" />
+              <span>回答错误 · 点击或按回车继续</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
