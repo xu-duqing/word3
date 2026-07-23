@@ -12,6 +12,10 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'prompt', // 检测到更新后由用户确认再应用
         includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'masked-icon.svg'], // 需要缓存的静态资源
+        workbox: {
+          skipWaiting: false,
+          clientsClaim: false,
+        },
         manifest: {
           name: '梧桐背单词',       // 应用完整名称
           short_name: '梧桐背单词',        // 桌面上显示的简称

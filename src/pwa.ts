@@ -11,7 +11,7 @@ let _updateSW: ((reloadPage?: boolean) => Promise<void>) | null = null;
 /**
  * 初始化 PWA Service Worker
  * - registerType: 'prompt'，新版本不会自动应用，需用户确认
- * - 应用切回前台（visibilitychange / focus）时主动向服务器检查更新
+ * - 应用切回前台或恢复联网时主动向服务器检查更新
  */
 export function initPWA() {
   const updateSW = registerSW({
@@ -29,19 +29,24 @@ export function initPWA() {
     onRegisteredSW(_swUrl, registration) {
       if (!registration) return;
 
+      const checkForUpdates = () => {
+        if (navigator.onLine) {
+          registration.update().catch(() => {});
+        }
+      };
+
       // 1. 切回前台（可见性变为 visible）时检查升级
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && navigator.onLine) {
-          registration.update().catch(() => {});
+        if (document.visibilityState === 'visible') {
+          checkForUpdates();
         }
       });
 
       // 2. 窗口重新获得焦点（focus）时检查升级
-      window.addEventListener('focus', () => {
-        if (navigator.onLine) {
-          registration.update().catch(() => {});
-        }
-      });
+      window.addEventListener('focus', checkForUpdates);
+
+      // 3. 网络恢复时立即检查升级
+      window.addEventListener('online', checkForUpdates);
     },
   });
 
@@ -68,12 +73,18 @@ export function getPWAState() {
 /** 用户确认后应用更新（会刷新页面加载新版本） */
 export function applyPWAUpdate() {
   if (_updateSW) {
-    _updateSW(true);
+    void _updateSW(true);
   }
 }
 
 /** 用户暂时跳过本次更新提示 */
 export function dismissPWAUpdate() {
   _needRefresh = false;
+  emit();
+}
+
+/** 关闭首次缓存完成后的离线就绪提示 */
+export function dismissPWAOfflineReady() {
+  _offlineReady = false;
   emit();
 }

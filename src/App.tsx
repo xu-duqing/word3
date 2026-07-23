@@ -263,11 +263,14 @@ export default function App() {
   // Render Onboarding Screen if incomplete
   if (!progress.onboardingCompleted) {
     return (
-      <OnboardingView
-        libraries={libraries}
-        onComplete={handleOnboardingComplete}
-        onCustomImportRequest={() => setCurrentView('settings')}
-      />
+      <>
+        <OnboardingView
+          libraries={libraries}
+          onComplete={handleOnboardingComplete}
+          onCustomImportRequest={() => setCurrentView('settings')}
+        />
+        <PwaUpdatePrompt />
+      </>
     );
   }
 
