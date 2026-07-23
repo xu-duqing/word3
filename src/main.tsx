@@ -1,6 +1,7 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
+import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import './index.css';
 import { initPWA } from './pwa';
 
@@ -8,8 +9,10 @@ import { initPWA } from './pwa';
 initPWA();
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <>
+    <PwaInstallPrompt />
+    <StrictMode>
+      <App />
+    </StrictMode>
+  </>,
 );
-

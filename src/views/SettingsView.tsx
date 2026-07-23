@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, ChevronRight, Upload, RotateCcw, Volume2, Check, Moon, Sun, Smartphone } from 'lucide-react';
 import { Library, UserProgress } from '../types';
 import { parseCustomLibraryText } from '../utils/storage';
-import { resetIOSPwaGuideDismiss } from '../components/IOSPwaGuide';
+import { showPwaInstallPrompt } from '../components/PwaInstallPrompt';
 
 interface SettingsViewProps {
   progress: UserProgress;
@@ -192,16 +192,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
             <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800 overflow-hidden shadow-2xs">
               <button
-                onClick={() => {
-                  resetIOSPwaGuideDismiss();
-                  onBack();
-                }}
+                onClick={showPwaInstallPrompt}
                 className="w-full p-4.5 flex items-center justify-between text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition"
               >
                 <div className="flex items-center gap-2">
                   <Smartphone className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
                   <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
-                    重新查看「添加到主屏幕」引导
+                    安装应用 / 查看安装引导
                   </span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
@@ -221,7 +218,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           <div className="text-center text-[10px] text-neutral-400 dark:text-neutral-500 pt-2">
-            三连背单词 v1.0.0 · 开门见山，零干扰背词
+            梧桐背单词 v1.0.0 · 开门见山，无痛背单词
           </div>
         </div>
 

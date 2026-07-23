@@ -17,7 +17,6 @@ import { HeaderBar } from './components/HeaderBar';
 import { SpellingCard } from './components/SpellingCard';
 import { ChoiceCard } from './components/ChoiceCard';
 import { DailyCompleteView } from './components/DailyCompleteView';
-import { IOSPwaGuide } from './components/IOSPwaGuide';
 import { PwaUpdatePrompt } from './components/PwaUpdatePrompt';
 
 // Full Screen Page Views
@@ -27,6 +26,13 @@ import { WordbookView } from './views/WordbookView';
 import { SettingsView } from './views/SettingsView';
 
 type ViewMode = 'practice' | 'calendar' | 'wordbook' | 'settings';
+
+const AppShell: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <>
+    {children}
+    <PwaUpdatePrompt />
+  </>
+);
 
 export default function App() {
   // Global States
@@ -268,7 +274,7 @@ export default function App() {
   // Render Full Page View according to currentView
   if (currentView === 'calendar') {
     return (
-      <>
+      <AppShell>
         <StatsCalendarView
           dailyLogs={dailyLogs}
           currentStreak={progress.currentStreak}
@@ -277,14 +283,13 @@ export default function App() {
           activeLibrary={activeLibrary}
           onBack={() => setCurrentView('practice')}
         />
-        <PwaUpdatePrompt />
-      </>
+      </AppShell>
     );
   }
 
   if (currentView === 'wordbook') {
     return (
-      <>
+      <AppShell>
         <WordbookView
           words={words}
           activeLibrary={activeLibrary}
@@ -292,14 +297,13 @@ export default function App() {
           todayWordIds={todayWordIds}
           onBack={() => setCurrentView('practice')}
         />
-        <PwaUpdatePrompt />
-      </>
+      </AppShell>
     );
   }
 
   if (currentView === 'settings') {
     return (
-      <>
+      <AppShell>
         <SettingsView
           progress={progress}
           libraries={libraries}
@@ -310,66 +314,61 @@ export default function App() {
           onImportCustomLibrary={handleImportCustomLibrary}
           onBack={() => setCurrentView('practice')}
         />
-        <PwaUpdatePrompt />
-      </>
+      </AppShell>
     );
   }
 
   // Default Full Screen View: Practice Stage
   return (
-    <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in">
-      {/* Top Header Navigation Bar */}
-      <HeaderBar
-        currentProgress={sessionCorrectCount}
-        targetN={progress.dailyGoal}
-        activeLibrary={activeLibrary}
-        darkMode={progress.darkMode}
-        onToggleDarkMode={() => handleUpdateProgress({ darkMode: !progress.darkMode })}
-        onOpenWordbook={() => setCurrentView('wordbook')}
-        onOpenCalendar={() => setCurrentView('calendar')}
-        onOpenSettings={() => setCurrentView('settings')}
-      />
+    <AppShell>
+      <div className="min-h-screen bg-[#f7f6f2] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-900 animate-fade-in">
+        {/* Top Header Navigation Bar */}
+        <HeaderBar
+          currentProgress={sessionCorrectCount}
+          targetN={progress.dailyGoal}
+          activeLibrary={activeLibrary}
+          darkMode={progress.darkMode}
+          onToggleDarkMode={() => handleUpdateProgress({ darkMode: !progress.darkMode })}
+          onOpenWordbook={() => setCurrentView('wordbook')}
+          onOpenCalendar={() => setCurrentView('calendar')}
+          onOpenSettings={() => setCurrentView('settings')}
+        />
 
-      {/* Main Core Practice Card Container */}
-      <main className="flex-1 flex items-center justify-center py-4">
-        {!isSessionFinished && currentCard ? (
-          <div key={`${currentCard.word.id}_${currentIndex}`} className="w-full">
-            {currentCard.mode === 'spelling' ? (
-              <SpellingCard
-                word={currentCard.word}
-                soundEnabled={progress.soundEnabled}
-                onAnswer={handleAnswer}
-              />
-            ) : (
-              <ChoiceCard
-                word={currentCard.word}
-                options={currentCard.options || []}
-                soundEnabled={progress.soundEnabled}
-                onAnswer={handleAnswer}
-              />
-            )}
-          </div>
-        ) : (
-          <DailyCompleteView
-            targetN={progress.dailyGoal}
-            sessionCorrectCount={sessionCorrectCount}
-            sessionTotalCount={queue.length}
-            currentStreak={progress.currentStreak}
-            onPracticeAnotherSet={() => initQueue(words, progress.dailyGoal)}
-            onOpenCalendar={() => setCurrentView('calendar')}
-            onOpenWordbook={() => setCurrentView('wordbook')}
-          />
-        )}
-      </main>
+        {/* Main Core Practice Card Container */}
+        <main className="flex-1 flex items-center justify-center py-4">
+          {!isSessionFinished && currentCard ? (
+            <div key={`${currentCard.word.id}_${currentIndex}`} className="w-full">
+              {currentCard.mode === 'spelling' ? (
+                <SpellingCard
+                  word={currentCard.word}
+                  soundEnabled={progress.soundEnabled}
+                  onAnswer={handleAnswer}
+                />
+              ) : (
+                <ChoiceCard
+                  word={currentCard.word}
+                  options={currentCard.options || []}
+                  soundEnabled={progress.soundEnabled}
+                  onAnswer={handleAnswer}
+                />
+              )}
+            </div>
+          ) : (
+            <DailyCompleteView
+              targetN={progress.dailyGoal}
+              sessionCorrectCount={sessionCorrectCount}
+              sessionTotalCount={queue.length}
+              currentStreak={progress.currentStreak}
+              onPracticeAnotherSet={() => initQueue(words, progress.dailyGoal)}
+              onOpenCalendar={() => setCurrentView('calendar')}
+              onOpenWordbook={() => setCurrentView('wordbook')}
+            />
+          )}
+        </main>
 
-      {/* Bottom Footer */}
-      <footer className="text-center py-2 text-[11px] text-neutral-400 select-none" />
-
-      {/* iOS PWA 安装引导浮层：仅在 iOS Safari + 未安装时展示一次 */}
-      <IOSPwaGuide enabled={progress.onboardingCompleted} />
-
-      {/* PWA 新版本提示：检测到更新时由用户确认后再应用 */}
-      <PwaUpdatePrompt />
-    </div>
+        {/* Bottom Footer */}
+        <footer className="text-center py-2 text-[11px] text-neutral-400 select-none" />
+      </div>
+    </AppShell>
   );
 }

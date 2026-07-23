@@ -11,6 +11,11 @@
     ],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "types": [
+      "node",
+      "dom-chromium-installation-events",
+      "web-app-manifest"
+    ],
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,

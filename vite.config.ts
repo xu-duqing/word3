@@ -13,9 +13,10 @@ export default defineConfig(() => {
         registerType: 'prompt', // 检测到更新后由用户确认再应用
         includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'masked-icon.svg'], // 需要缓存的静态资源
         manifest: {
-          name: '三连背单词',       // 应用完整名称
-          short_name: 'Word3',             // 桌面上显示的简称
-          description: '零干扰、打开即背的极简记忆工具',
+          name: '梧桐背单词',       // 应用完整名称
+          short_name: '梧桐背单词',        // 桌面上显示的简称
+          description: '零干扰、打开即背的无痛记忆工具',
+          lang: 'zh-CN',
           theme_color: '#f7f6f2',          // 状态栏/顶部主题颜色
           background_color: '#f7f6f2',     // 启动屏背景色
           display: 'standalone',           // 独立应用模式（隐藏浏览器地址栏）

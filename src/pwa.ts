@@ -23,7 +23,7 @@ export function initPWA() {
     },
     onOfflineReady() {
       _offlineReady = true;
-      console.log('三连背单词：已就绪，支持离线访问');
+      console.log('梧桐背单词：已就绪，支持离线访问');
       emit();
     },
     onRegisteredSW(_swUrl, registration) {
